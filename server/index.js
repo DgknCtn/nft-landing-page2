@@ -6,7 +6,7 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 3001;
 
-// MySQL bağlantısı
+// Create MySQL connection pool
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -15,6 +15,16 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
+});
+
+// Test database connection
+pool.getConnection((err, connection) => {
+  if (err) {
+    console.error('Database connection failed:', err);
+    return;
+  }
+  console.log('Successfully connected to the database.');
+  connection.release();
 });
 
 // Middleware
@@ -33,34 +43,49 @@ const isValidDiscordUsername = (username) => {
 
 // Whitelist API endpoint'i
 app.post('/api/whitelist', async (req, res) => {
+  console.log('Received whitelist request:', req.body);
+  
   const { walletAddress, discordUsername } = req.body;
 
   // Input validasyonu
   if (!walletAddress || !discordUsername) {
+    console.log('Missing required fields');
     return res.status(400).json({ message: 'Wallet address and Discord username are required' });
   }
 
   if (!isValidEthereumAddress(walletAddress)) {
+    console.log('Invalid Ethereum address:', walletAddress);
     return res.status(400).json({ message: 'Invalid Ethereum wallet address' });
   }
 
   if (!isValidDiscordUsername(discordUsername)) {
+    console.log('Invalid Discord username:', discordUsername);
     return res.status(400).json({ message: 'Invalid Discord username format' });
   }
 
   try {
+    console.log('Attempting database insertion...');
+    
     // Veritabanına kayıt
     const [result] = await pool.execute(
       'INSERT INTO whitelist (wallet_address, discord_username) VALUES (?, ?)',
       [walletAddress, discordUsername]
     );
 
+    console.log('Database insertion successful:', result);
+
     res.status(201).json({
       message: 'Successfully added to whitelist',
       id: result.insertId
     });
   } catch (error) {
-    console.error('Database error:', error);
+    console.error('Database error details:', {
+      code: error.code,
+      errno: error.errno,
+      sqlMessage: error.sqlMessage,
+      sqlState: error.sqlState,
+      sql: error.sql
+    });
 
     // Duplicate entry hatası kontrolü
     if (error.code === 'ER_DUP_ENTRY') {
@@ -70,6 +95,7 @@ app.post('/api/whitelist', async (req, res) => {
       if (error.message.includes('discord_username')) {
         return res.status(400).json({ message: 'This Discord username is already whitelisted' });
       }
+      return res.status(400).json({ message: 'This entry already exists in the whitelist' });
     }
 
     res.status(500).json({ message: 'An error occurred while processing your request' });
@@ -97,11 +123,12 @@ app.get('/api/whitelist/check', async (req, res) => {
     }
 
     const [rows] = await pool.execute(query, params);
-    
-    res.json({
-      isWhitelisted: rows.length > 0,
-      data: rows[0] || null
-    });
+
+    if (rows.length > 0) {
+      res.json({ isWhitelisted: true, entry: rows[0] });
+    } else {
+      res.json({ isWhitelisted: false });
+    }
   } catch (error) {
     console.error('Database error:', error);
     res.status(500).json({ message: 'An error occurred while checking whitelist status' });

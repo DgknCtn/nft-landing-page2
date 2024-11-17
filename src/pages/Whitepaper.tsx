@@ -1,77 +1,80 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FileText, Download } from 'lucide-react';
 
-const Whitepaper = () => {
+const Whitepaper: React.FC = () => {
   const sections = [
     {
       title: 'Introduction',
-      content: 'VANTH represents a revolutionary approach to digital collectibles, combining unique artwork with blockchain technology. Our collection of 4,444 NFTs introduces innovative features and a sustainable ecosystem.',
+      content: `VANTH NFT is a revolutionary digital art collection that combines unique artwork with utility through staking and governance mechanisms. Our vision is to create a sustainable ecosystem that rewards long-term holders and active community members.`
     },
     {
       title: 'Tokenomics',
-      content: 'The VNTH token serves as the backbone of our ecosystem, enabling staking rewards and governance participation. Total supply and distribution mechanisms are designed to ensure long-term sustainability.',
+      content: `Total Supply: 10,000 NFTs
+Whitelist Price: 0.08 ETH
+Public Price: 0.1 ETH
+Royalty Fee: 5%
+Staking Rewards: Daily VNTH token distribution`
     },
     {
-      title: 'Staking Mechanism',
-      content: 'VANTH NFT holders can stake their assets to earn VNTH tokens. The staking system is designed to reward long-term holders while maintaining ecosystem stability.',
+      title: 'Utility',
+      content: `• NFT Staking with daily rewards
+• Governance rights in DAO
+• Exclusive merchandise access
+• Priority access to future drops
+• Community events and giveaways`
     },
     {
-      title: 'Community Governance',
-      content: "Token holders will have the ability to participate in key decisions affecting the project's future through a decentralized governance system.",
+      title: 'Technology',
+      content: `Smart Contracts: Solidity (ERC-721A)
+Blockchain: Ethereum
+IPFS Storage: NFT metadata and images
+Security: Multi-sig treasury and time-locked contracts`
     },
+    {
+      title: 'Team',
+      content: `Our team consists of experienced developers, artists, and marketing professionals with a proven track record in the NFT and DeFi space. We are committed to building a long-term project with real utility and value for our community.`
+    }
   ];
 
   return (
-    <div className="py-12">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-4xl mx-auto"
-      >
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-            Whitepaper
-          </h1>
-          <button className="flex items-center gap-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 rounded-lg transition-colors duration-200">
-            <FileText className="w-4 h-4" />
-            <span>Download PDF</span>
-          </button>
-        </div>
+    <div className="min-h-screen py-20 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        <motion.h1
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-cyan-400 to-teal-400 bg-clip-text text-transparent"
+        >
+          Whitepaper
+        </motion.h1>
 
-        <div className="bg-black/30 p-8 rounded-lg backdrop-blur-sm mb-8">
-          <h2 className="text-2xl font-bold mb-4">Executive Summary</h2>
-          <p className="text-gray-300 leading-relaxed">
-            The VANTH NFT collection represents a groundbreaking initiative in the digital art space, combining unique artwork with innovative tokenomics and community-driven governance. This whitepaper outlines our vision, technology, and roadmap for creating a sustainable digital art ecosystem.
-          </p>
-        </div>
-
-        <div className="space-y-6">
+        <div className="space-y-8">
           {sections.map((section, index) => (
             <motion.div
-              key={index}
+              key={section.title}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.2 }}
-              className="bg-black/30 p-6 rounded-lg backdrop-blur-sm"
+              className="bg-black/40 backdrop-blur-lg rounded-lg p-6 border border-cyan-500/20"
             >
-              <h3 className="text-xl font-bold mb-3">{section.title}</h3>
-              <p className="text-gray-300 leading-relaxed">{section.content}</p>
+              <h2 className="text-2xl font-semibold text-cyan-400 mb-4">
+                {section.title}
+              </h2>
+              <div className="text-gray-300 whitespace-pre-line">
+                {section.content}
+              </div>
             </motion.div>
           ))}
         </div>
 
-        <div className="mt-8 bg-purple-500/10 border border-purple-500/20 p-6 rounded-lg">
-          <h3 className="text-xl font-bold mb-3 text-purple-400">Download Full Version</h3>
-          <p className="text-gray-300 mb-4">
-            Access the complete whitepaper for detailed technical specifications, tokenomics, and ecosystem details.
-          </p>
-          <button className="flex items-center gap-2 px-6 py-3 bg-purple-500 hover:bg-purple-600 rounded-lg transition-colors duration-200">
-            <Download className="w-4 h-4" />
-            <span>Download Full Whitepaper</span>
-          </button>
-        </div>
-      </motion.div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1 }}
+          className="mt-12 text-center text-gray-400"
+        >
+          <p>For more detailed information, join our Discord community or follow us on Twitter.</p>
+        </motion.div>
+      </div>
     </div>
   );
 };

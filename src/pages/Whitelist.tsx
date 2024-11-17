@@ -34,12 +34,12 @@ const Whitelist: React.FC = () => {
 
     // Form validasyonu
     if (!isValidEthereumAddress(formData.walletAddress)) {
-      setError('Lütfen geçerli bir Ethereum cüzdan adresi girin (0x ile başlayan 42 karakterlik adres)');
+      setError('Please enter a valid Ethereum wallet address (42 characters starting with 0x)');
       return;
     }
 
     if (!isValidDiscordUsername(formData.discordUsername)) {
-      setError('Lütfen geçerli bir Discord kullanıcı adı girin (Örnek: Kullanıcı#1234)');
+      setError('Please enter a valid Discord username (Example: Username#1234)');
       return;
     }
 
@@ -50,7 +50,7 @@ const Whitelist: React.FC = () => {
       setSuccess(true);
       setFormData({ walletAddress: '', discordUsername: '' });
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
+      setError(err.response?.data?.message || 'An error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -66,13 +66,13 @@ const Whitelist: React.FC = () => {
           className="bg-black/40 backdrop-blur-lg p-8 rounded-2xl shadow-xl border border-cyan-500/20"
         >
           <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-cyan-400 to-teal-400 bg-clip-text text-transparent">
-            Whitelist Kaydı
+            Whitelist Registration
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="walletAddress" className="block text-sm font-medium text-gray-300 mb-2">
-                Ethereum Cüzdan Adresi
+                Ethereum Wallet Address
               </label>
               <input
                 type="text"
@@ -87,7 +87,7 @@ const Whitelist: React.FC = () => {
 
             <div>
               <label htmlFor="discordUsername" className="block text-sm font-medium text-gray-300 mb-2">
-                Discord Kullanıcı Adı
+                Discord Username
               </label>
               <input
                 type="text"
@@ -95,7 +95,7 @@ const Whitelist: React.FC = () => {
                 name="discordUsername"
                 value={formData.discordUsername}
                 onChange={handleChange}
-                placeholder="Kullanıcı#1234"
+                placeholder="Username#1234"
                 className="w-full px-4 py-3 rounded-lg bg-black/50 border border-cyan-500/20 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition-colors duration-200"
               />
             </div>
@@ -116,7 +116,7 @@ const Whitelist: React.FC = () => {
                 animate={{ opacity: 1 }}
                 className="text-teal-400 text-sm mt-2 bg-teal-500/10 p-3 rounded-lg"
               >
-                Whitelist kaydınız başarıyla alındı!
+                Successfully registered to whitelist!
               </motion.div>
             )}
 
@@ -127,7 +127,7 @@ const Whitelist: React.FC = () => {
               disabled={loading}
               className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-cyan-500 to-teal-500 text-white font-medium hover:from-cyan-600 hover:to-teal-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Kaydediliyor...' : 'Whitelist\'e Katıl'}
+              {loading ? 'Processing...' : 'Register'}
             </motion.button>
           </form>
         </motion.div>
