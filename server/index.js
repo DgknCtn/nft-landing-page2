@@ -8,7 +8,10 @@ const app = express();
 
 // CORS ayarları
 app.use(cors({
-  origin: '*', // Tüm domainlerden gelen isteklere izin ver
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://yourfrontend.com'] // Frontend domain'inizi buraya ekleyeceğiz
+    : ['http://localhost:5173'],
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -16,14 +19,17 @@ app.use(cors({
 app.use(express.json());
 
 // MySQL bağlantısı
-const connection = mysql.createConnection({
+const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'joinv_anth',
   password: process.env.DB_PASSWORD || 'vanth0697',
-  database: process.env.DB_NAME || 'whitelist_db'
+  database: process.env.DB_NAME || 'whitelist_db',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
 
-connection.connect((err) => {
+pool.getConnection((err, connection) => {
   if (err) {
     console.error('MySQL bağlantı hatası:', err);
     return;
@@ -59,6 +65,7 @@ connection.connect((err) => {
       console.error('Theme tablo oluşturma hatası:', err);
     }
   });
+  connection.release();
 });
 
 // Whitelist kayıt endpoint'i
@@ -75,7 +82,9 @@ app.post('/api/whitelist', async (req, res) => {
   const query = 'INSERT INTO whitelist (wallet_address, discord_username) VALUES (?, ?)';
   
   try {
+    const connection = await pool.getConnection();
     await connection.promise().execute(query, [walletAddress, discordUsername]);
+    connection.release();
     res.json({ success: true, message: 'Kayıt başarılı' });
   } catch (error) {
     console.error('Kayıt hatası:', error);
@@ -93,20 +102,26 @@ app.post('/api/theme', async (req, res) => {
 
   try {
     // Önce mevcut tema ayarını kontrol et
+    const connection = await pool.getConnection();
     const [rows] = await connection.promise().query('SELECT id FROM theme_settings LIMIT 1');
+    connection.release();
     
     if (rows.length > 0) {
       // Mevcut ayarı güncelle
+      const connection = await pool.getConnection();
       await connection.promise().execute(
         'UPDATE theme_settings SET color = ? WHERE id = ?',
         [color, rows[0].id]
       );
+      connection.release();
     } else {
       // Yeni ayar ekle
+      const connection = await pool.getConnection();
       await connection.promise().execute(
         'INSERT INTO theme_settings (color) VALUES (?)',
         [color]
       );
+      connection.release();
     }
     
     res.json({ success: true, message: 'Tema rengi güncellendi' });
@@ -119,7 +134,9 @@ app.post('/api/theme', async (req, res) => {
 // Mevcut tema rengini getir
 app.get('/api/theme', async (req, res) => {
   try {
+    const connection = await pool.getConnection();
     const [rows] = await connection.promise().query('SELECT color FROM theme_settings ORDER BY updated_at DESC LIMIT 1');
+    connection.release();
     res.json({ success: true, color: rows[0]?.color || '#000000' });
   } catch (error) {
     console.error('Tema getirme hatası:', error);

@@ -1,35 +1,17 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import SocialSidebar from './components/SocialSidebar';
-import Home from './pages/Home';
-import About from './pages/About';
-import Roadmap from './pages/Roadmap';
-import Whitepaper from './pages/Whitepaper';
-import Whitelist from './pages/Whitelist';
-import Stake from './pages/Stake';
 import Admin from './pages/Admin';
-import Footer from './components/Footer';
+import Home from './pages/Home';
+import Stake from './pages/Stake';
 
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-[#0a0a0a] text-white">
-        <Navbar />
-        <SocialSidebar />
-        <main className="pt-20 px-4 md:px-8 lg:px-16">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/roadmap" element={<Roadmap />} />
-            <Route path="/whitepaper" element={<Whitepaper />} />
-            <Route path="/whitelist" element={<Whitelist />} />
-            <Route path="/stake" element={<Stake />} />
-            <Route path="/admin" element={<Admin />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/stake" element={<Stake />} />
+      </Routes>
     </Router>
   );
 }
