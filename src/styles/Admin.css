@@ -6,11 +6,12 @@
 
 .theme-section,
 .whitelist-section {
-  background: #ffffff;
+  background: rgba(0, 0, 0, 0.3);
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(128, 90, 213, 0.2);
 }
 
 .form-group {
@@ -21,32 +22,45 @@
   display: block;
   margin-bottom: 5px;
   font-weight: bold;
+  color: #e5e7eb;
 }
 
 .form-group input {
   width: 100%;
   padding: 8px;
-  border: 1px solid #ddd;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(128, 90, 213, 0.3);
   border-radius: 4px;
+  color: white;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #805ad5;
 }
 
 button {
-  background: #007bff;
+  background: #805ad5;
   color: white;
   border: none;
   padding: 10px 20px;
   border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 button:hover {
-  background: #0056b3;
+  background: #6b46c1;
 }
 
 .color-picker {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.color-picker label {
+  color: #e5e7eb;
 }
 
 .color-picker input[type="color"] {
@@ -56,4 +70,5 @@ button:hover {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  background: none;
 }

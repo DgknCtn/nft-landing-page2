@@ -2,17 +2,24 @@ const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 require('dotenv').config();
+const path = require('path');
 
 const app = express();
 
-app.use(cors());
+// CORS ayarları
+app.use(cors({
+  origin: '*', // Tüm domainlerden gelen isteklere izin ver
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 // MySQL bağlantısı
 const connection = mysql.createConnection({
   host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
+  user: process.env.DB_USER || 'joinv_anth',
+  password: process.env.DB_PASSWORD || 'vanth0697',
   database: process.env.DB_NAME || 'whitelist_db'
 });
 
@@ -23,8 +30,8 @@ connection.connect((err) => {
   }
   console.log('MySQL bağlantısı başarılı');
   
-  // Veritabanı tablosunu oluştur
-  const createTableQuery = `
+  // Veritabanı tablolarını oluştur
+  const createWhitelistTable = `
     CREATE TABLE IF NOT EXISTS whitelist (
       id INT AUTO_INCREMENT PRIMARY KEY,
       wallet_address VARCHAR(255) NOT NULL,
@@ -33,9 +40,23 @@ connection.connect((err) => {
     )
   `;
   
-  connection.query(createTableQuery, (err) => {
+  const createThemeTable = `
+    CREATE TABLE IF NOT EXISTS theme_settings (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      color VARCHAR(7) NOT NULL,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )
+  `;
+  
+  connection.query(createWhitelistTable, (err) => {
     if (err) {
-      console.error('Tablo oluşturma hatası:', err);
+      console.error('Whitelist tablo oluşturma hatası:', err);
+    }
+  });
+
+  connection.query(createThemeTable, (err) => {
+    if (err) {
+      console.error('Theme tablo oluşturma hatası:', err);
     }
   });
 });
@@ -63,10 +84,55 @@ app.post('/api/whitelist', async (req, res) => {
 });
 
 // Site teması endpoint'i
-app.post('/api/theme', (req, res) => {
+app.post('/api/theme', async (req, res) => {
   const { color } = req.body;
-  // Burada renk değerini veritabanına kaydedebilirsiniz
-  res.json({ success: true, message: 'Tema rengi güncellendi' });
+  
+  if (!color) {
+    return res.status(400).json({ success: false, message: 'Renk değeri gerekli' });
+  }
+
+  try {
+    // Önce mevcut tema ayarını kontrol et
+    const [rows] = await connection.promise().query('SELECT id FROM theme_settings LIMIT 1');
+    
+    if (rows.length > 0) {
+      // Mevcut ayarı güncelle
+      await connection.promise().execute(
+        'UPDATE theme_settings SET color = ? WHERE id = ?',
+        [color, rows[0].id]
+      );
+    } else {
+      // Yeni ayar ekle
+      await connection.promise().execute(
+        'INSERT INTO theme_settings (color) VALUES (?)',
+        [color]
+      );
+    }
+    
+    res.json({ success: true, message: 'Tema rengi güncellendi' });
+  } catch (error) {
+    console.error('Tema güncelleme hatası:', error);
+    res.status(500).json({ success: false, message: 'Tema güncellenirken bir hata oluştu' });
+  }
+});
+
+// Mevcut tema rengini getir
+app.get('/api/theme', async (req, res) => {
+  try {
+    const [rows] = await connection.promise().query('SELECT color FROM theme_settings ORDER BY updated_at DESC LIMIT 1');
+    res.json({ success: true, color: rows[0]?.color || '#000000' });
+  } catch (error) {
+    console.error('Tema getirme hatası:', error);
+    res.status(500).json({ success: false, message: 'Tema rengi alınırken bir hata oluştu' });
+  }
+});
+
+// Serve static files from the dist directory
+app.use(express.static('dist'));
+
+// Catch-all route to handle client-side routing
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
 const PORT = process.env.PORT || 3001;

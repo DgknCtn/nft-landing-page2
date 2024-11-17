@@ -8,6 +8,7 @@ import Roadmap from './pages/Roadmap';
 import Whitepaper from './pages/Whitepaper';
 import Whitelist from './pages/Whitelist';
 import Stake from './pages/Stake';
+import Admin from './pages/Admin';
 import Footer from './components/Footer';
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
             <Route path="/whitepaper" element={<Whitepaper />} />
             <Route path="/whitelist" element={<Whitelist />} />
             <Route path="/stake" element={<Stake />} />
+            <Route path="/admin" element={<Admin />} />
           </Routes>
         </main>
         <Footer />
