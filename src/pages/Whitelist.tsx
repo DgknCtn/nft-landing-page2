@@ -1,60 +1,136 @@
 import React, { useState } from 'react';
+import axios from '../lib/axios';
+import { motion } from 'framer-motion';
 
-const Whitelist = () => {
+const Whitelist: React.FC = () => {
   const [formData, setFormData] = useState({
     walletAddress: '',
-    discordUsername: '',
+    discordUsername: ''
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  // Ethereum cüzdan adresi validasyonu
+  const isValidEthereumAddress = (address: string) => {
+    return /^0x[a-fA-F0-9]{40}$/.test(address);
+  };
+
+  // Discord kullanıcı adı validasyonu
+  const isValidDiscordUsername = (username: string) => {
+    return /^.{3,32}#[0-9]{4}$/.test(username);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    setError(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Backend integration will be implemented later
-    alert('Whitelist functionality will be implemented soon!');
+    setError(null);
+    setSuccess(false);
+
+    // Form validasyonu
+    if (!isValidEthereumAddress(formData.walletAddress)) {
+      setError('Lütfen geçerli bir Ethereum cüzdan adresi girin (0x ile başlayan 42 karakterlik adres)');
+      return;
+    }
+
+    if (!isValidDiscordUsername(formData.discordUsername)) {
+      setError('Lütfen geçerli bir Discord kullanıcı adı girin (Örnek: Kullanıcı#1234)');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      await axios.post('/api/whitelist', formData);
+      setSuccess(true);
+      setFormData({ walletAddress: '', discordUsername: '' });
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-[calc(100vh-5rem)] flex items-center justify-center">
-      <div className="bg-black/30 backdrop-blur-sm p-8 rounded-lg max-w-xl w-full">
-        <h2 className="text-3xl font-bold mb-6 text-center">Join the Whitelist</h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="walletAddress" className="block text-sm font-medium text-gray-300 mb-2">
-              Wallet Address
-            </label>
-            <input
-              type="text"
-              id="walletAddress"
-              value={formData.walletAddress}
-              onChange={(e) => setFormData({ ...formData, walletAddress: e.target.value })}
-              className="w-full px-4 py-3 bg-black/50 border border-gray-700 rounded-lg focus:outline-none focus:border-purple-500 text-white"
-              placeholder="Enter your wallet address"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="discordUsername" className="block text-sm font-medium text-gray-300 mb-2">
-              Discord Username
-            </label>
-            <input
-              type="text"
-              id="discordUsername"
-              value={formData.discordUsername}
-              onChange={(e) => setFormData({ ...formData, discordUsername: e.target.value })}
-              className="w-full px-4 py-3 bg-black/50 border border-gray-700 rounded-lg focus:outline-none focus:border-purple-500 text-white"
-              placeholder="Enter your Discord username"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full py-3 bg-purple-500 hover:bg-purple-600 rounded-lg font-semibold transition-colors duration-200"
-          >
-            Join Whitelist
-          </button>
-        </form>
-        <p className="mt-4 text-sm text-gray-400 text-center">
-          Make sure to join our Discord server and follow us on Twitter to stay updated!
-        </p>
+    <div className="min-h-screen py-20 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="bg-black/40 backdrop-blur-lg p-8 rounded-2xl shadow-xl border border-cyan-500/20"
+        >
+          <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-cyan-400 to-teal-400 bg-clip-text text-transparent">
+            Whitelist Kaydı
+          </h2>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="walletAddress" className="block text-sm font-medium text-gray-300 mb-2">
+                Ethereum Cüzdan Adresi
+              </label>
+              <input
+                type="text"
+                id="walletAddress"
+                name="walletAddress"
+                value={formData.walletAddress}
+                onChange={handleChange}
+                placeholder="0x..."
+                className="w-full px-4 py-3 rounded-lg bg-black/50 border border-cyan-500/20 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition-colors duration-200"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="discordUsername" className="block text-sm font-medium text-gray-300 mb-2">
+                Discord Kullanıcı Adı
+              </label>
+              <input
+                type="text"
+                id="discordUsername"
+                name="discordUsername"
+                value={formData.discordUsername}
+                onChange={handleChange}
+                placeholder="Kullanıcı#1234"
+                className="w-full px-4 py-3 rounded-lg bg-black/50 border border-cyan-500/20 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition-colors duration-200"
+              />
+            </div>
+
+            {error && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-red-400 text-sm mt-2 bg-red-500/10 p-3 rounded-lg"
+              >
+                {error}
+              </motion.div>
+            )}
+
+            {success && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-teal-400 text-sm mt-2 bg-teal-500/10 p-3 rounded-lg"
+              >
+                Whitelist kaydınız başarıyla alındı!
+              </motion.div>
+            )}
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-cyan-500 to-teal-500 text-white font-medium hover:from-cyan-600 hover:to-teal-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Kaydediliyor...' : 'Whitelist\'e Katıl'}
+            </motion.button>
+          </form>
+        </motion.div>
       </div>
     </div>
   );

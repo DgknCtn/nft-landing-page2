@@ -1,92 +1,91 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useTheme } from '../context/ThemeContext';
-import '../styles/Admin.css';
-
-// Axios için base URL ayarı
-axios.defaults.baseURL = 'http://localhost:3001';
+import React, { useState, useEffect } from 'react';
+import axios from '../lib/axios';
+import { motion } from 'framer-motion';
 
 const Admin: React.FC = () => {
-  const { themeColor, setThemeColor } = useTheme();
-  const [walletAddress, setWalletAddress] = useState('');
-  const [discordUsername, setDiscordUsername] = useState('');
+  const [whitelistEntries, setWhitelistEntries] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleColorChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newColor = e.target.value;
+  useEffect(() => {
+    fetchWhitelistEntries();
+  }, []);
+
+  const fetchWhitelistEntries = async () => {
     try {
-      const response = await axios.post('/api/theme', { color: newColor });
-      if (response.data.success) {
-        setThemeColor(newColor);
-        alert('Tema rengi başarıyla güncellendi!');
-      }
-    } catch (error) {
-      console.error('Tema güncelleme hatası:', error);
-      alert('Tema rengi güncellenirken bir hata oluştu!');
+      const response = await axios.get('/api/whitelist/all');
+      setWhitelistEntries(response.data);
+      setError(null);
+    } catch (err) {
+      setError('Failed to fetch whitelist entries');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post('/api/whitelist', {
-        walletAddress,
-        discordUsername
-      });
-      if (response.data.success) {
-        alert('Başarıyla kaydedildi!');
-        setWalletAddress('');
-        setDiscordUsername('');
-      }
-    } catch (error) {
-      console.error('Kayıt hatası:', error);
-      alert('Kayıt sırasında bir hata oluştu!');
-    }
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-cyan-400">Loading...</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-[calc(100vh-5rem)] py-12">
-      <div className="admin-container">
-        <h1 className="text-4xl font-bold mb-8 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent text-center">
+    <div className="min-h-screen py-20 px-4 sm:px-6 lg:px-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-7xl mx-auto"
+      >
+        <h1 className="text-3xl font-bold mb-8 bg-gradient-to-r from-cyan-400 to-teal-400 bg-clip-text text-transparent">
           Admin Panel
         </h1>
-        
-        <div className="theme-section">
-          <h2 className="text-2xl font-bold mb-4">Site Teması</h2>
-          <div className="color-picker">
-            <label>Site Rengi: </label>
-            <input 
-              type="color" 
-              value={themeColor}
-              onChange={handleColorChange}
-            />
+
+        {error && (
+          <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400">
+            {error}
+          </div>
+        )}
+
+        <div className="bg-black/40 backdrop-blur-lg rounded-2xl border border-cyan-500/20 overflow-hidden">
+          <div className="p-6">
+            <h2 className="text-xl font-semibold mb-4 text-cyan-400">Whitelist Entries</h2>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-cyan-500/20">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">ID</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Wallet Address</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Discord Username</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-cyan-500/10">
+                  {whitelistEntries.map((entry) => (
+                    <tr key={entry.id} className="hover:bg-cyan-500/5 transition-colors duration-150">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{entry.id}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{entry.wallet_address}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{entry.discord_username}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                        {new Date(entry.created_at).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {whitelistEntries.length === 0 && (
+              <div className="text-center py-8 text-gray-400">
+                No entries found
+              </div>
+            )}
           </div>
         </div>
-
-        <div className="whitelist-section">
-          <h2 className="text-2xl font-bold mb-4">Whitelist Yönetimi</h2>
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label>Cüzdan Adresi:</label>
-              <input
-                type="text"
-                value={walletAddress}
-                onChange={(e) => setWalletAddress(e.target.value)}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label>Discord Kullanıcı Adı:</label>
-              <input
-                type="text"
-                value={discordUsername}
-                onChange={(e) => setDiscordUsername(e.target.value)}
-                required
-              />
-            </div>
-            <button type="submit">Kaydet</button>
-          </form>
-        </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

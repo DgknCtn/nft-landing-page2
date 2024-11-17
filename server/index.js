@@ -1,158 +1,137 @@
 const express = require('express');
-const mysql = require('mysql2');
 const cors = require('cors');
+const mysql = require('mysql2/promise');
 require('dotenv').config();
-const path = require('path');
 
 const app = express();
-
-// CORS ayarları
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://yourfrontend.com'] // Frontend domain'inizi buraya ekleyeceğiz
-    : ['http://localhost:5173'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
-app.use(express.json());
+const port = process.env.PORT || 3001;
 
 // MySQL bağlantısı
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'joinv_anth',
-  password: process.env.DB_PASSWORD || 'vanth0697',
-  database: process.env.DB_NAME || 'whitelist_db',
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
 });
 
-pool.getConnection((err, connection) => {
-  if (err) {
-    console.error('MySQL bağlantı hatası:', err);
-    return;
-  }
-  console.log('MySQL bağlantısı başarılı');
-  
-  // Veritabanı tablolarını oluştur
-  const createWhitelistTable = `
-    CREATE TABLE IF NOT EXISTS whitelist (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      wallet_address VARCHAR(255) NOT NULL,
-      discord_username VARCHAR(255) NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `;
-  
-  const createThemeTable = `
-    CREATE TABLE IF NOT EXISTS theme_settings (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      color VARCHAR(7) NOT NULL,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    )
-  `;
-  
-  connection.query(createWhitelistTable, (err) => {
-    if (err) {
-      console.error('Whitelist tablo oluşturma hatası:', err);
-    }
-  });
+// Middleware
+app.use(cors());
+app.use(express.json());
 
-  connection.query(createThemeTable, (err) => {
-    if (err) {
-      console.error('Theme tablo oluşturma hatası:', err);
-    }
-  });
-  connection.release();
-});
+// Ethereum adresi validasyonu
+const isValidEthereumAddress = (address) => {
+  return /^0x[a-fA-F0-9]{40}$/.test(address);
+};
 
-// Whitelist kayıt endpoint'i
+// Discord kullanıcı adı validasyonu
+const isValidDiscordUsername = (username) => {
+  return /^.{3,32}#[0-9]{4}$/.test(username);
+};
+
+// Whitelist API endpoint'i
 app.post('/api/whitelist', async (req, res) => {
   const { walletAddress, discordUsername } = req.body;
-  
+
+  // Input validasyonu
   if (!walletAddress || !discordUsername) {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'Cüzdan adresi ve Discord kullanıcı adı gerekli' 
+    return res.status(400).json({ message: 'Wallet address and Discord username are required' });
+  }
+
+  if (!isValidEthereumAddress(walletAddress)) {
+    return res.status(400).json({ message: 'Invalid Ethereum wallet address' });
+  }
+
+  if (!isValidDiscordUsername(discordUsername)) {
+    return res.status(400).json({ message: 'Invalid Discord username format' });
+  }
+
+  try {
+    // Veritabanına kayıt
+    const [result] = await pool.execute(
+      'INSERT INTO whitelist (wallet_address, discord_username) VALUES (?, ?)',
+      [walletAddress, discordUsername]
+    );
+
+    res.status(201).json({
+      message: 'Successfully added to whitelist',
+      id: result.insertId
     });
-  }
-
-  const query = 'INSERT INTO whitelist (wallet_address, discord_username) VALUES (?, ?)';
-  
-  try {
-    const connection = await pool.getConnection();
-    await connection.promise().execute(query, [walletAddress, discordUsername]);
-    connection.release();
-    res.json({ success: true, message: 'Kayıt başarılı' });
   } catch (error) {
-    console.error('Kayıt hatası:', error);
-    res.status(500).json({ success: false, message: 'Kayıt sırasında bir hata oluştu' });
-  }
-});
+    console.error('Database error:', error);
 
-// Site teması endpoint'i
-app.post('/api/theme', async (req, res) => {
-  const { color } = req.body;
-  
-  if (!color) {
-    return res.status(400).json({ success: false, message: 'Renk değeri gerekli' });
-  }
-
-  try {
-    // Önce mevcut tema ayarını kontrol et
-    const connection = await pool.getConnection();
-    const [rows] = await connection.promise().query('SELECT id FROM theme_settings LIMIT 1');
-    connection.release();
-    
-    if (rows.length > 0) {
-      // Mevcut ayarı güncelle
-      const connection = await pool.getConnection();
-      await connection.promise().execute(
-        'UPDATE theme_settings SET color = ? WHERE id = ?',
-        [color, rows[0].id]
-      );
-      connection.release();
-    } else {
-      // Yeni ayar ekle
-      const connection = await pool.getConnection();
-      await connection.promise().execute(
-        'INSERT INTO theme_settings (color) VALUES (?)',
-        [color]
-      );
-      connection.release();
+    // Duplicate entry hatası kontrolü
+    if (error.code === 'ER_DUP_ENTRY') {
+      if (error.message.includes('wallet_address')) {
+        return res.status(400).json({ message: 'This wallet address is already whitelisted' });
+      }
+      if (error.message.includes('discord_username')) {
+        return res.status(400).json({ message: 'This Discord username is already whitelisted' });
+      }
     }
-    
-    res.json({ success: true, message: 'Tema rengi güncellendi' });
-  } catch (error) {
-    console.error('Tema güncelleme hatası:', error);
-    res.status(500).json({ success: false, message: 'Tema güncellenirken bir hata oluştu' });
+
+    res.status(500).json({ message: 'An error occurred while processing your request' });
   }
 });
 
-// Mevcut tema rengini getir
-app.get('/api/theme', async (req, res) => {
+// Whitelist durumu kontrolü endpoint'i
+app.get('/api/whitelist/check', async (req, res) => {
+  const { walletAddress, discordUsername } = req.query;
+
+  if (!walletAddress && !discordUsername) {
+    return res.status(400).json({ message: 'Either wallet address or Discord username is required' });
+  }
+
   try {
-    const connection = await pool.getConnection();
-    const [rows] = await connection.promise().query('SELECT color FROM theme_settings ORDER BY updated_at DESC LIMIT 1');
-    connection.release();
-    res.json({ success: true, color: rows[0]?.color || '#000000' });
+    let query = 'SELECT * FROM whitelist WHERE ';
+    let params = [];
+
+    if (walletAddress) {
+      query += 'wallet_address = ?';
+      params.push(walletAddress);
+    } else {
+      query += 'discord_username = ?';
+      params.push(discordUsername);
+    }
+
+    const [rows] = await pool.execute(query, params);
+    
+    res.json({
+      isWhitelisted: rows.length > 0,
+      data: rows[0] || null
+    });
   } catch (error) {
-    console.error('Tema getirme hatası:', error);
-    res.status(500).json({ success: false, message: 'Tema rengi alınırken bir hata oluştu' });
+    console.error('Database error:', error);
+    res.status(500).json({ message: 'An error occurred while checking whitelist status' });
   }
 });
 
-// Serve static files from the dist directory
-app.use(express.static('dist'));
-
-// Catch-all route to handle client-side routing
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../dist/index.html'));
+// Admin için whitelist listesi endpoint'i
+app.get('/api/whitelist/all', async (req, res) => {
+  try {
+    const [rows] = await pool.execute('SELECT * FROM whitelist ORDER BY created_at DESC');
+    res.json(rows);
+  } catch (error) {
+    console.error('Database error:', error);
+    res.status(500).json({ message: 'An error occurred while fetching whitelist entries' });
+  }
 });
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Server ${PORT} portunda çalışıyor`);
+// Tema rengi API endpoint'i
+app.post('/api/theme', (req, res) => {
+  const { color } = req.body;
+  // Theme color implementation will be added later
+  res.json({ success: true, color });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Something went wrong!' });
+});
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
