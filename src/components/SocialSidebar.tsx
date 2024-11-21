@@ -6,17 +6,17 @@ const SocialSidebar: React.FC = () => {
     {
       name: 'Twitter',
       icon: <Twitter className="h-6 w-6" />,
-      url: 'https://twitter.com/vanthnft',
+      url: 'https://twitter.com/joinvanth',
     },
     {
       name: 'Discord',
       icon: <MessageCircle className="h-6 w-6" />,
-      url: 'https://discord.gg/vanthnft',
+      url: 'https://discord.gg/',
     },
     {
       name: 'Website',
       icon: <Globe className="h-6 w-6" />,
-      url: 'https://vanthnft.com',
+      url: 'https://joinvanth.com',
     },
   ];
 

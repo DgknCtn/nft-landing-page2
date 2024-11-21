@@ -2,7 +2,7 @@ import axios from 'axios';
 import axiosRetry from 'axios-retry';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3001',
+  baseURL: 'https://94.73.145.4:3001',  // Direct IP with HTTPS
   headers: {
     'Content-Type': 'application/json',
   },
