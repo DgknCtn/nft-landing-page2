@@ -1,143 +1,135 @@
-import React from 'react';
-import { motion } from 'framer-motion';
 import { useWeb3React } from '@web3-react/core';
-import { injected } from '../utils/web3';
+import { injected } from '../utils/connectors';
+import toast from 'react-hot-toast';
+import { useState } from 'react';
 
 const Stake: React.FC = () => {
   const { active, account, activate, deactivate } = useWeb3React();
+  const [isStaking, setIsStaking] = useState(false);
+  const [stakeAmount, setStakeAmount] = useState('');
 
-  const connect = async () => {
+  const connectWallet = async () => {
     try {
       await activate(injected);
+      toast.success('Wallet connected successfully!');
     } catch (error) {
-      console.error('Error connecting:', error);
+      toast.error('Failed to connect wallet');
+      console.error(error);
     }
   };
 
-  const disconnect = () => {
+  const disconnectWallet = () => {
     try {
       deactivate();
+      toast.success('Wallet disconnected');
     } catch (error) {
-      console.error('Error disconnecting:', error);
+      console.error(error);
     }
   };
 
-  const stats = {
-    totalStaked: '1,234',
-    totalRewards: '5,678',
-    apr: '120%',
-    lockPeriod: '30 days',
+  const handleStake = async () => {
+    if (!stakeAmount || isNaN(Number(stakeAmount))) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+    setIsStaking(true);
+    try {
+      // Simulating stake transaction
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      toast.success('Staking successful!');
+      setStakeAmount('');
+    } catch (error) {
+      toast.error('Staking failed');
+      console.error(error);
+    } finally {
+      setIsStaking(false);
+    }
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-10 px-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-teal-400 bg-clip-text text-transparent">
-            Stake Your NFTs
-          </h1>
-          <p className="mt-4 text-gray-400">
-            Earn rewards by staking your Vanth NFTs
-          </p>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white p-8">
+      <div className="max-w-6xl mx-auto">
+        {/* Wallet Connection */}
+        <div className="flex justify-end mb-8">
+          {!active ? (
+            <button
+              onClick={connectWallet}
+              className="bg-gradient-to-r from-cyan-500 to-blue-500 px-6 py-2 rounded-lg font-semibold hover:from-cyan-600 hover:to-blue-600 transition-all"
+            >
+              Connect Wallet
+            </button>
+          ) : (
+            <button
+              onClick={disconnectWallet}
+              className="bg-gradient-to-r from-red-500 to-pink-500 px-6 py-2 rounded-lg font-semibold hover:from-red-600 hover:to-pink-600 transition-all"
+            >
+              Disconnect {account?.slice(0, 6)}...{account?.slice(-4)}
+            </button>
+          )}
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-          {[
-            { label: 'Total Staked', value: stats.totalStaked },
-            { label: 'Total Rewards', value: stats.totalRewards },
-            { label: 'APR', value: stats.apr },
-            { label: 'Lock Period', value: stats.lockPeriod },
-          ].map((stat, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-black/40 backdrop-blur-lg rounded-xl p-6 border border-cyan-500/20"
-            >
-              <h3 className="text-gray-400 text-sm mb-2">{stat.label}</h3>
-              <p className="text-2xl font-bold text-white">{stat.value}</p>
-            </motion.div>
-          ))}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-xl p-6 rounded-2xl border border-gray-700/50">
+            <h3 className="text-gray-400 mb-2">Total Value Locked</h3>
+            <p className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
+              $4,234,567
+            </p>
+          </div>
+          <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-xl p-6 rounded-2xl border border-gray-700/50">
+            <h3 className="text-gray-400 mb-2">APR</h3>
+            <p className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
+              12.5%
+            </p>
+          </div>
+          <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-xl p-6 rounded-2xl border border-gray-700/50">
+            <h3 className="text-gray-400 mb-2">Your Rewards</h3>
+            <p className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
+              {active ? '234.5 VNTH' : '0 VNTH'}
+            </p>
+          </div>
         </div>
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Staking Panel */}
-          <div className="bg-black/40 backdrop-blur-lg rounded-xl p-6 border border-cyan-500/20">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold">Stake NFTs</h2>
-              {active && (
-                <button
-                  onClick={disconnect}
-                  className="text-sm text-gray-400 hover:text-cyan-400 transition-colors"
-                >
-                  {account?.slice(0, 6)}...{account?.slice(-4)}
-                </button>
-              )}
-            </div>
-            
-            {!active ? (
+        {/* Staking Interface */}
+        {active && (
+          <div className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-xl p-8 rounded-2xl border border-gray-700/50">
+            <h2 className="text-2xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
+              Stake Your Tokens
+            </h2>
+            <div className="flex flex-col md:flex-row gap-4">
+              <input
+                type="text"
+                value={stakeAmount}
+                onChange={(e) => setStakeAmount(e.target.value)}
+                placeholder="Enter amount to stake"
+                className="flex-1 bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              />
               <button
-                onClick={connect}
-                className="w-full px-6 py-3 bg-gradient-to-r from-cyan-500 to-teal-500 rounded-lg font-medium hover:from-cyan-600 hover:to-teal-600 transition-all"
+                onClick={handleStake}
+                disabled={isStaking || !stakeAmount}
+                className={`px-8 py-2 rounded-lg font-semibold transition-all ${
+                  isStaking || !stakeAmount
+                    ? 'bg-gray-600 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600'
+                }`}
               >
-                Connect Wallet
+                {isStaking ? 'Staking...' : 'Stake'}
               </button>
-            ) : (
-              <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  {[1, 2, 3, 4].map((nft) => (
-                    <div
-                      key={nft}
-                      className="aspect-square rounded-lg border-2 border-cyan-500/20 hover:border-cyan-400 transition-colors cursor-pointer"
-                    >
-                      <img
-                        src={`/src/assets/nft${nft}.png`}
-                        alt={`NFT ${nft}`}
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                    </div>
-                  ))}
-                </div>
-                <button className="w-full px-6 py-3 bg-gradient-to-r from-cyan-500 to-teal-500 rounded-lg font-medium hover:from-cyan-600 hover:to-teal-600 transition-all">
-                  Stake Selected NFTs
-                </button>
-              </div>
-            )}
+            </div>
           </div>
+        )}
 
-          {/* Rewards Panel */}
-          <div className="bg-black/40 backdrop-blur-lg rounded-xl p-6 border border-cyan-500/20">
-            <h2 className="text-2xl font-bold mb-6">Your Rewards</h2>
-            {!active ? (
-              <div className="text-center text-gray-400">
-                Connect your wallet to view rewards
-              </div>
-            ) : (
-              <div className="space-y-6">
-                <div className="p-4 bg-black/40 rounded-lg border border-cyan-500/20">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-gray-400">Available Rewards</span>
-                    <span className="text-xl font-bold">0.00</span>
-                  </div>
-                  <button className="w-full px-6 py-3 bg-gradient-to-r from-cyan-500 to-teal-500 rounded-lg font-medium hover:from-cyan-600 hover:to-teal-600 transition-all">
-                    Claim Rewards
-                  </button>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-semibold mb-4">Staked NFTs</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    {/* Staked NFTs will be displayed here */}
-                  </div>
-                </div>
-              </div>
-            )}
+        {/* Connect Wallet Message */}
+        {!active && (
+          <div className="text-center p-8 bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-xl rounded-2xl border border-gray-700/50">
+            <h2 className="text-2xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
+              Connect Your Wallet
+            </h2>
+            <p className="text-gray-400">
+              Connect your wallet to start staking and earning rewards
+            </p>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

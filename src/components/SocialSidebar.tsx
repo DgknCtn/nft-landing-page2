@@ -1,5 +1,5 @@
 import React from 'react';
-import { Twitter, MessageCircle, Globe } from 'lucide-react';
+import { Twitter, MessageCircle } from 'lucide-react';
 
 const SocialSidebar: React.FC = () => {
   const socials = [
@@ -13,11 +13,6 @@ const SocialSidebar: React.FC = () => {
       icon: <MessageCircle className="h-6 w-6" />,
       url: 'https://discord.gg/',
     },
-    {
-      name: 'Website',
-      icon: <Globe className="h-6 w-6" />,
-      url: 'https://joinvanth.com',
-    },
   ];
 
   return (
@@ -28,7 +23,7 @@ const SocialSidebar: React.FC = () => {
           href={social.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="p-2 rounded-full bg-black/50 backdrop-blur-sm border border-purple-500/20 hover:border-purple-500/40 hover:bg-purple-900/20 transition-all duration-300 text-gray-400 hover:text-purple-400"
+          className="p-2 rounded-full bg-black/50 backdrop-blur-sm border border-cyan-500/20 hover:border-cyan-500/40 hover:bg-cyan-900/20 transition-all duration-300 text-gray-400 hover:text-cyan-400"
           title={social.name}
         >
           {social.icon}
