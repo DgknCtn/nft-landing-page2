@@ -1,6 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
   theme: {
     extend: {
       animation: {
@@ -22,6 +25,15 @@ export default {
           },
         },
       },
+      colors: {
+        vanth: {
+          primary: '#A60F1B',    // Ana kırmızı
+          secondary: '#73141B',  // Koyu kırmızı
+          dark: '#401519',      // Çok koyu kırmızı
+          accent: '#F20C36',    // Parlak kırmızı
+          base: '#1E2126',      // Koyu gri arkaplan
+        }
+      }
     },
   },
   plugins: [],

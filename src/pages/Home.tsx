@@ -1,121 +1,161 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { EffectCoverflow, Autoplay, Pagination } from 'swiper/modules';
-import Countdown from 'react-countdown';
-import 'swiper/css';
-import 'swiper/css/effect-coverflow';
-import 'swiper/css/pagination';
+import { Twitter, MessageCircle, FileText } from 'lucide-react';
+import Gallery from '../components/Gallery';
+import Roadmap from '../components/Roadmap';
+import logo from '../assets/logo.png';
 
 const Home: React.FC = () => {
-  const nfts = [
-    { id: 1, image: '/images/nft1.png', name: 'NFT #1' },
-    { id: 2, image: '/images/nft2.png', name: 'NFT #2' },
-    { id: 3, image: '/images/nft3.png', name: 'NFT #3' },
-    { id: 4, image: '/images/nft4.png', name: 'NFT #4' },
-    { id: 5, image: '/images/nft5.png', name: 'NFT #5' },
-  ];
-
-  // Mint başlangıç zamanı (örnek: 7 gün sonra)
-  const mintStartTime = Date.now() + 7 * 24 * 60 * 60 * 1000;
-
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-b from-black via-vanth-primary/5 to-black">
       {/* Hero Section */}
-      <motion.div 
-        className="relative h-screen flex items-center justify-center"
-        style={{
-          backgroundImage: 'url(/hero-bg.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center z-10 p-8"
-        >
-          <h1 className="text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-cyan-400 to-teal-400 text-transparent bg-clip-text">
-            VANTH NFT
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 text-gray-300">
-            Discover, Collect, and Stake Unique Digital Art
-          </p>
+      <section className="min-h-screen flex items-center justify-center relative">
+        <div className="text-center">
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-6xl md:text-8xl font-bold text-vanth-primary mb-8"
+          >
+            JOIN VANTH
+          </motion.h1>
           
-          {/* Mint Countdown */}
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 max-w-md mx-auto">
-            <h3 className="text-xl font-semibold mb-4">Mint Starts In</h3>
-            <Countdown
-              date={mintStartTime}
-              renderer={({ days, hours, minutes, seconds }) => (
-                <div className="grid grid-cols-4 gap-4">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold">{days}</div>
-                    <div className="text-sm text-gray-400">Days</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold">{hours}</div>
-                    <div className="text-sm text-gray-400">Hours</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold">{minutes}</div>
-                    <div className="text-sm text-gray-400">Mins</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold">{seconds}</div>
-                    <div className="text-sm text-gray-400">Secs</div>
-                  </div>
-                </div>
-              )}
-            />
+          <div className="flex items-center justify-center gap-8 mb-12">
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="bg-vanth-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-vanth-secondary transition-colors"
+            >
+              Buy Vanth
+            </motion.button>
+            
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="flex gap-4"
+            >
+              <a
+                href="https://x.com/joinvanth"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-vanth-primary transition-colors"
+              >
+                <Twitter size={24} />
+              </a>
+              <a
+                href="https://discord.gg/vanthnft"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-vanth-primary transition-colors"
+              >
+                <MessageCircle size={24} />
+              </a>
+              <a
+                href="https://vanth.gitbook.io/vanth"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-vanth-primary transition-colors"
+              >
+                <FileText size={24} />
+              </a>
+            </motion.div>
           </div>
-        </motion.div>
-      </motion.div>
+        </div>
+        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2">
+          <motion.div
+            animate={{ y: [0, 10, 0] }}
+            transition={{ repeat: Infinity, duration: 2 }}
+            className="text-vanth-accent"
+          >
+            ↓ Scroll to explore
+          </motion.div>
+        </div>
+      </section>
 
-      {/* NFT Carousel */}
-      <div className="py-20 bg-black/50 backdrop-blur-sm">
-        <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-cyan-400 to-teal-400 text-transparent bg-clip-text">
-          Featured Collections
-        </h2>
-        <Swiper
-          effect="coverflow"
-          grabCursor={true}
-          centeredSlides={true}
-          slidesPerView="auto"
-          coverflowEffect={{
-            rotate: 50,
-            stretch: 0,
-            depth: 100,
-            modifier: 1,
-            slideShadows: true,
-          }}
-          autoplay={{
-            delay: 2500,
-            disableOnInteraction: false,
-          }}
-          pagination={true}
-          modules={[EffectCoverflow, Autoplay, Pagination]}
-          className="w-full max-w-6xl mx-auto"
-        >
-          {nfts.map((nft) => (
-            <SwiperSlide key={nft.id} className="max-w-sm">
-              <div className="relative group cursor-pointer mx-4">
-                <img
-                  src={nft.image}
-                  alt={nft.name}
-                  className="w-full aspect-square object-cover rounded-2xl transform transition-transform group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl flex items-end">
-                  <div className="p-6 w-full">
-                    <p className="text-white text-xl font-semibold">{nft.name}</p>
-                    <p className="text-gray-300 mt-2">Rare Digital Collectible</p>
-                  </div>
-                </div>
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+      {/* What is Vanth Section */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="max-w-3xl mx-auto text-center"
+          >
+            <h2 className="text-4xl font-bold mb-8">What is Vanth?</h2>
+            <p className="text-lg text-gray-300 leading-relaxed">
+              Vanth is a web3 focused project inspired by the best with an innovative and dynamic style.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Gallery Section */}
+      <section id="gallery" className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold mb-4">Vanth Gallery</h2>
+            <p className="text-lg text-gray-400">Discover our unique NFT collection</p>
+          </div>
+          <Gallery />
+        </div>
+      </section>
+
+      {/* Roadmap Section */}
+      <Roadmap />
+
+      {/* Community Section */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="max-w-3xl mx-auto text-center"
+          >
+            <h2 className="text-4xl font-bold mb-8">Join Our Community</h2>
+            <p className="text-lg text-gray-300 leading-relaxed mb-8">
+              Be part of something special. The Vanth community is a place where artists, collectors, and enthusiasts
+              come together to shape the future of digital art. Connect with like-minded individuals and participate
+              in exclusive events and decisions.
+            </p>
+            <div className="flex justify-center gap-6">
+              <motion.a
+                href="https://discord.gg/vanthnft"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-vanth-primary transition-colors"
+                whileHover={{ scale: 1.1 }}
+              >
+                <MessageCircle size={32} />
+              </motion.a>
+              <motion.a
+                href="https://x.com/joinvanth"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-vanth-primary transition-colors"
+                whileHover={{ scale: 1.1 }}
+              >
+                <Twitter size={32} />
+              </motion.a>
+              <motion.a
+                href="https://vanth.gitbook.io/vanth"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-vanth-primary transition-colors"
+                whileHover={{ scale: 1.1 }}
+              >
+                <FileText size={32} />
+              </motion.a>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Copyright */}
+      <div className="py-8 text-center text-gray-400 text-sm">
+        2024 Vanth. All rights reserved
       </div>
     </div>
   );
