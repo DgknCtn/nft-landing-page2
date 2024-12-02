@@ -5,11 +5,14 @@ const Explore: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedPrice, setSelectedPrice] = useState('All');
 
-  const mockNFTs = [
-    { id: 1, name: 'Cool Ape #1234', collection: 'BAYC', price: '99.5', image: '/images/nft1.png' },
-    { id: 2, name: 'Azuki #4567', collection: 'Azuki', price: '12.3', image: '/images/nft2.png' },
-    { id: 3, name: 'Doodle #7890', collection: 'Doodles', price: '8.1', image: '/images/nft3.png' },
-  ];
+  // Generate array of 10 NFTs
+  const mockNFTs = Array.from({ length: 5 }, (_, i) => ({
+    id: i + 1,
+    name: `Artwork #${i + 1}`,
+    collection: 'Gallery',
+    price: ((Math.random() * 2 + 0.5).toFixed(1)),
+    image: `/images/nft${i + 1}.png`
+  }));
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -47,7 +50,11 @@ const Explore: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {mockNFTs.map((nft) => (
           <div key={nft.id} className="bg-[#1A1A1A] rounded-xl overflow-hidden">
-            <img src={nft.image} alt={nft.name} className="w-full aspect-square object-cover" />
+            <img 
+              src={nft.image} 
+              alt={nft.name} 
+              className="w-full aspect-square object-cover hover:scale-105 transition-transform duration-300" 
+            />
             <div className="p-4">
               <p className="text-sm text-gray-400">{nft.collection}</p>
               <h3 className="text-white font-semibold mt-1">{nft.name}</h3>
