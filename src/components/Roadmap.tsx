@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 const Roadmap: React.FC = () => {
   const phases = [
     {
-      title: "Phase 1",
+      title: "2025 Q1",
       items: [
         "Concept Development: Create a unique narrative and artistic vision for each special character in the collection.",
         "Community Building: Build a strong community on social platforms (twitter and discord).",
@@ -13,7 +13,7 @@ const Roadmap: React.FC = () => {
       ]
     },
     {
-      title: "Phase 2",
+      title: "2025 Q2",
       items: [
         "Make the community the most predatory and open the first printing phase of the collection to whitelisted contributors, followed by transparent and fair sale to the public.",
         "Early adopters gain first access to key roles and interactive features.",
@@ -21,7 +21,7 @@ const Roadmap: React.FC = () => {
       ]
     },
     {
-      title: "Phase 3",
+      title: "2025 Q3",
       items: [
         "Assigning specific roles to each owner and creating a dedicated DAO.",
         "Special events within the project, raffles and access to decision-making within the project.",
@@ -30,7 +30,7 @@ const Roadmap: React.FC = () => {
       ]
     },
     {
-      title: "Phase 4",
+      title: "2025 Q4",
       items: [
         "VNTH Token Launch:",
         "For Vanth holders, the VNTH token will be quickly released to wallets via airdrop.",
@@ -38,7 +38,7 @@ const Roadmap: React.FC = () => {
       ]
     },
     {
-      title: "Phase 5",
+      title: "2026",
       items: [
         "Game integration: Develop a play-to-win (P2E) game featuring the NFT collection as in-game characters, assets.",
         "Private chat rooms created for owners to network and keep the community alive."

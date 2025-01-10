@@ -1,9 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Twitter, MessageCircle, FileText } from 'lucide-react';
 import Gallery from '../components/Gallery';
 import Roadmap from '../components/Roadmap';
 import logo from '../assets/logo.png';
+import xLogo from '../assets/x-logo.png';
+import discordLogo from '../assets/discord-logo.png';
+import bookLogo from '../assets/book-logo.png';
 
 const Home: React.FC = () => {
   return (
@@ -17,7 +19,7 @@ const Home: React.FC = () => {
             transition={{ duration: 0.8 }}
             className="text-6xl md:text-8xl font-bold text-vanth-primary mb-8"
           >
-            JOIN VANTH
+            VANTH
           </motion.h1>
           
           <div className="flex items-center justify-center gap-8 mb-12">
@@ -37,20 +39,32 @@ const Home: React.FC = () => {
               className="flex gap-4"
             >
               <a
+                href="https://discord.com/invite/wYdKFtEZMF"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-vanth-primary transition-colors"
+              >
+                <img 
+                  src={discordLogo} 
+                  alt="Discord" 
+                  width={24} 
+                  height={24} 
+                  className="brightness-100 hover:brightness-100 hover:filter hover:invert-[0.4] hover:sepia hover:saturate-[10000%] hover:hue-rotate-[320deg] transition-all" 
+                />
+              </a>
+              <a
                 href="https://x.com/joinvanth"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white hover:text-vanth-primary transition-colors"
               >
-                <Twitter size={24} />
-              </a>
-              <a
-                href="https://discord.gg/vanthnft"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white hover:text-vanth-primary transition-colors"
-              >
-                <MessageCircle size={24} />
+                <img 
+                  src={xLogo} 
+                  alt="X (Twitter)" 
+                  width={24} 
+                  height={24} 
+                  className="brightness-100 hover:brightness-100 hover:filter hover:invert-[0.4] hover:sepia hover:saturate-[10000%] hover:hue-rotate-[320deg] transition-all" 
+                />
               </a>
               <a
                 href="https://vanth.gitbook.io/vanth"
@@ -58,7 +72,13 @@ const Home: React.FC = () => {
                 rel="noopener noreferrer"
                 className="text-white hover:text-vanth-primary transition-colors"
               >
-                <FileText size={24} />
+                <img 
+                  src={bookLogo} 
+                  alt="GitBook" 
+                  width={24} 
+                  height={24} 
+                  className="brightness-100 hover:brightness-100 hover:filter hover:invert-[0.4] hover:sepia hover:saturate-[10000%] hover:hue-rotate-[320deg] transition-all" 
+                />
               </a>
             </motion.div>
           </div>
@@ -122,13 +142,19 @@ const Home: React.FC = () => {
             </p>
             <div className="flex justify-center gap-6">
               <motion.a
-                href="https://discord.gg/vanthnft"
+                href="https://discord.com/invite/wYdKFtEZMF"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white hover:text-vanth-primary transition-colors"
                 whileHover={{ scale: 1.1 }}
               >
-                <MessageCircle size={32} />
+                <img 
+                  src={discordLogo} 
+                  alt="Discord" 
+                  width={32} 
+                  height={32} 
+                  className="brightness-100 hover:brightness-100 hover:filter hover:invert-[0.4] hover:sepia hover:saturate-[10000%] hover:hue-rotate-[320deg] transition-all" 
+                />
               </motion.a>
               <motion.a
                 href="https://x.com/joinvanth"
@@ -137,7 +163,13 @@ const Home: React.FC = () => {
                 className="text-white hover:text-vanth-primary transition-colors"
                 whileHover={{ scale: 1.1 }}
               >
-                <Twitter size={32} />
+                <img 
+                  src={xLogo} 
+                  alt="X (Twitter)" 
+                  width={32} 
+                  height={32} 
+                  className="brightness-100 hover:brightness-100 hover:filter hover:invert-[0.4] hover:sepia hover:saturate-[10000%] hover:hue-rotate-[320deg] transition-all" 
+                />
               </motion.a>
               <motion.a
                 href="https://vanth.gitbook.io/vanth"
@@ -146,7 +178,13 @@ const Home: React.FC = () => {
                 className="text-white hover:text-vanth-primary transition-colors"
                 whileHover={{ scale: 1.1 }}
               >
-                <FileText size={32} />
+                <img 
+                  src={bookLogo} 
+                  alt="GitBook" 
+                  width={32} 
+                  height={32} 
+                  className="brightness-100 hover:brightness-100 hover:filter hover:invert-[0.4] hover:sepia hover:saturate-[10000%] hover:hue-rotate-[320deg] transition-all" 
+                />
               </motion.a>
             </div>
           </motion.div>

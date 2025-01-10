@@ -6,12 +6,12 @@ const SocialSidebar: React.FC = () => {
     {
       name: 'Twitter',
       icon: <Twitter className="h-6 w-6" />,
-      url: 'https://twitter.com/joinvanth',
+      url: 'https://x.com/joinvanth',
     },
     {
       name: 'Discord',
       icon: <MessageCircle className="h-6 w-6" />,
-      url: 'https://discord.gg/',
+      url: 'https://discord.com/invite/wYdKFtEZMF',
     },
   ];
 

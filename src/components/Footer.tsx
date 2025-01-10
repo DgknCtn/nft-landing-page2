@@ -67,7 +67,7 @@ const Footer: React.FC = () => {
               </li>
               <li>
                 <a 
-                  href="https://discord.gg/vanthnft" 
+                  href="https://discord.com/invite/wYdKFtEZMF" 
                   target="_blank" 
                   rel="noopener noreferrer" 
                   className="text-gray-400 hover:text-cyan-400 transition-colors block"
@@ -77,7 +77,7 @@ const Footer: React.FC = () => {
               </li>
               <li>
                 <a 
-                  href="https://twitter.com/vanthnft" 
+                  href="https://x.com/joinvanth" 
                   target="_blank" 
                   rel="noopener noreferrer" 
                   className="text-gray-400 hover:text-cyan-400 transition-colors block"
@@ -93,7 +93,7 @@ const Footer: React.FC = () => {
             <h4 className="text-lg font-semibold text-cyan-400 mb-4">Connect</h4>
             <div className="flex space-x-4">
               <a
-                href="https://twitter.com/joinvanth"
+                href="https://x.com/joinvanth"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-cyan-400 transition-colors p-2 rounded-lg hover:bg-cyan-500/10"
@@ -101,7 +101,7 @@ const Footer: React.FC = () => {
                 <Twitter className="w-6 h-6" />
               </a>
               <a
-                href="https://discord.gg/"
+                href="https://discord.com/invite/wYdKFtEZMF"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-cyan-400 transition-colors p-2 rounded-lg hover:bg-cyan-500/10"
